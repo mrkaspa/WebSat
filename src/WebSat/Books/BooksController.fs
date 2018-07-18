@@ -9,7 +9,7 @@ module Controller =
     let indexAction (ctx : HttpContext) =
         task {
             let cnf = Controller.getConfig ctx
-            let! result = Database.getAll cnf.connectionString
+            let! result = Repository.getAll cnf.connectionString
             match result with
             | Ok result -> return Views.index ctx (List.ofSeq result)
             | Error ex -> return raise ex
@@ -18,7 +18,7 @@ module Controller =
     let showAction (ctx : HttpContext) (id : string) =
         task {
             let cnf = Controller.getConfig ctx
-            let! result = Database.getById cnf.connectionString id
+            let! result = Repository.getById cnf.connectionString id
             match result with
             | Ok(Some result) -> return Views.show ctx result
             | Ok None -> return NotFound.layout
@@ -31,7 +31,7 @@ module Controller =
     let editAction (ctx : HttpContext) (id : string) =
         task {
             let cnf = Controller.getConfig ctx
-            let! result = Database.getById cnf.connectionString id
+            let! result = Repository.getById cnf.connectionString id
             match result with
             | Ok(Some result) -> return Views.edit ctx result Map.empty
             | Ok None -> return NotFound.layout
@@ -44,7 +44,7 @@ module Controller =
             let validateResult = Validation.validate input
             if validateResult.IsEmpty then
                 let cnf = Controller.getConfig ctx
-                let! result = Database.insert cnf.connectionString input
+                let! result = Repository.insert cnf.connectionString input
                 match result with
                 | Ok _ -> return! Controller.redirect ctx (Links.index ctx)
                 | Error ex -> return raise ex
@@ -59,7 +59,7 @@ module Controller =
             let validateResult = Validation.validate input
             if validateResult.IsEmpty then
                 let cnf = Controller.getConfig ctx
-                let! result = Database.update cnf.connectionString input
+                let! result = Repository.update cnf.connectionString input
                 match result with
                 | Ok _ -> return! Controller.redirect ctx (Links.index ctx)
                 | Error ex -> return raise ex
@@ -71,7 +71,7 @@ module Controller =
     let deleteAction (ctx : HttpContext) (id : string) =
         task {
             let cnf = Controller.getConfig ctx
-            let! result = Database.delete cnf.connectionString id
+            let! result = Repository.delete cnf.connectionString id
             match result with
             | Ok _ -> return! Controller.redirect ctx (Links.index ctx)
             | Error ex -> return raise ex
